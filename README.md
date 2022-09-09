@@ -3,7 +3,7 @@ ECE 4750 Section 2: RTL Design with Verilog
 ==========================================================================
 
 This repository contains the code and documentation for ECE 4750 Section
-2 on the Verilog RTL design. You can find the actual section
+2 on the RTL design with Verilog. You can find the actual section
 document in the repo here:
 
  - [docs/index.md](docs/index.md)
