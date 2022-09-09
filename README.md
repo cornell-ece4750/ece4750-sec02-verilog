@@ -1,5 +1,5 @@
 
-ECE 4750 Section 2: Verilog RTL Design
+ECE 4750 Section 2: RTL Design with Verilog
 ==========================================================================
 
 This repository contains the code and documentation for ECE 4750 Section
