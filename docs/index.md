@@ -1,5 +1,5 @@
 
-ECE 4750 Section 2: Verilog RTL Design
+ECE 4750 Section 2: RTL Design with Verilog
 ==========================================================================
 
  - Author: Christopher Batten
