@@ -36,6 +36,17 @@ class TestHarness( Component ):
     return s.src.line_trace() + " > " + s.imul.line_trace() + " > " + s.sink.line_trace()
 
 #-------------------------------------------------------------------------
+# mk_imsg/mk_omsg
+#-------------------------------------------------------------------------
+# Make input/output msgs, truncate ints to ensure they fit in 32 bits.
+
+def mk_imsg( a, b ):
+  return concat( Bits32( a, trunc_int=True ), Bits32( b, trunc_int=True ) )
+
+def mk_omsg( a ):
+  return Bits32( a, trunc_int=True )
+
+#-------------------------------------------------------------------------
 # Simulate
 #-------------------------------------------------------------------------
 
@@ -49,10 +60,8 @@ in1_values = [ int(x,0) for x in argv[2::2] ]
 imsgs = []
 omsgs = []
 for in0_value,in1_value in zip(in0_values,in1_values):
-  in0_bits = Bits32(in0_value)
-  in1_bits = Bits32(in1_value)
-  imsgs.extend([ concat( in0_bits, in1_bits ) ])
-  omsgs.extend([ Bits32( in0_bits * in1_bits, trunc_int=True ) ])
+  imsgs.extend([ mk_imsg( in0_value, in1_value ) ])
+  omsgs.extend([ mk_omsg( in0_value * in1_value ) ])
 
 # Create and elaborate the model
 
