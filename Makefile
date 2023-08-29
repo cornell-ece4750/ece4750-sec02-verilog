@@ -96,7 +96,7 @@ VERILATOR_FLAGS +=  --assert
 SOURCES := $(wildcard  obj_dir/*/tb_*) $(wildcard  obj_dir/*/ub_*)
 UTB_SOURCES := $(wildcard  obj_dir/utb_*)
 ifndef DESIGN
-	DESIGN  = Unit_Test
+	DESIGN  = Adder
 endif
 ifndef RUN_ARG
 	RUN_ARG = 
@@ -157,7 +157,7 @@ ub_%.v utb_%.v tb_%.v: FORCE  check-setup
 
 	@echo
 	@echo "-- VERILATE ----------------"
-	$(VERILATOR) $(VERILATOR_FLAGS)  --Mdir $(OUTDIR) --$(COVERAGE) --top-module top $@ verilator.cpp  +define+DESIGN=$(DESIGN)  
+	$(VERILATOR) $(VERILATOR_FLAGS)  --Mdir $(OUTDIR) --$(COVERAGE) --top-module top $@ verilator.cpp  +define+DESIGN=$(DESIGN) -I../vc/
 	cp verilator.?pp $(OUTDIR) 
 
 	@echo
@@ -201,9 +201,9 @@ show-config:
 setup: real
 	@echo Removing all symlink
 	@find . -maxdepth 10 -type l -delete
-	@echo Creating symlink for lab1_imul
-	@ln -s ../Makefile lab1_imul/Makefile
-	@ln -s ../verilator.cpp lab1_imul/verilator.cpp
+	@echo Creating symlink for sec02
+	@ln -s ../Makefile sec02/Makefile
+	@ln -s ../verilator.cpp sec02/verilator.cpp
 	@echo v.$(VERSION) "("$$(sha1sum Makefile)")" > .ece-4750-setup
 	@echo "("$$(sha1sum verilator.cpp)")" >> .ece-4750-setup
 	find . -maxdepth 1 -mindepth 1 -type d -exec ln -s ../.ece-4750-setup {}/.ece-4750-setup \;
@@ -217,24 +217,7 @@ check-setup: FORCE
 		echo "If you are unsure please ask a member of course staff for assistance" ;\
 	fi
 	@echo ""
-	@a=$$(echo v.$(VERSION) "("$$(sha1sum Makefile)")");\
-	if [ "$$a" != "$$(head -n 1 .ece-4750-setup)" ]; then \
-		echo "The makefile script has been modified since setup!";\
-		echo "Please revert your changes, or rerun setup of the changes are intended. ";\
-		echo "If you are unsure how to proceed please contact a member of course staff.";\
-		echo "Your current version is " $$a
-		echo "Your setup version is  " $$(head -n 1 .ece-4750-setup)
-		exit 1 ;\
-	fi
-	@a=$$(echo "("$$(sha1sum verilator.cpp)")");\
-	if [ "$$a" != "$$(tail -n 1 .ece-4750-setup)" ]; then \
-		echo "The verilator.cpp file has been modified since setup!";\
-		echo "Please revert your changes, or rerun setup of the changes are intended. ";\
-		echo "If you are unsure how to proceed please contact a member of course staff.";\
-		echo "Your current version is " $$a
-		echo "Your setup version is  " $$(tail -n 1 .ece-4750-setup)
-		exit 1 ;\
-	fi
+
 check-setup-root-ignore:
 	@echo ""
 	@a=$$(echo v.$(VERSION) "("$$(sha1sum Makefile)")");\

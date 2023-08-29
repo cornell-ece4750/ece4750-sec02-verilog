@@ -1,7 +1,8 @@
 //========================================================================
-// tb_Adder
+// tb_Adder_FixedDelay
 //========================================================================
-// A Verilog test bench for our latency-insensitive adder
+// A Verilog test bench for our latency-insensitive adder with fixed
+// source/sink delays
 
 `default_nettype none
 `timescale 1ps/1ps
@@ -12,8 +13,8 @@
 
 `include `"`DESIGN.v`"
 `include "vc/trace.v"
-`include "vc/TestRandDelaySource.v"
-`include "vc/TestRandDelaySink.v"
+`include "vc/TestFixedDelaySource.v"
+`include "vc/TestFixedDelaySink.v"
 
 //------------------------------------------------------------------------
 // Testbench defines
@@ -23,6 +24,9 @@ localparam NUM_TESTS = 3;
 
 localparam  INPUT_TEST_SIZE = 64;
 localparam OUTPUT_TEST_SIZE = 32;
+
+localparam SRC_DELAY = 32'b0;
+localparam SNK_DELAY = 32'b0;
 
 //------------------------------------------------------------------------
 // Top-level module
@@ -59,13 +63,15 @@ module top(  input logic clk, input logic linetrace );
   // Test source
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  vc_TestSource 
+  vc_TestFixedDelaySource 
   #(
     .p_msg_nbits ( INPUT_TEST_SIZE ),
     .p_num_msgs  (       NUM_TESTS )
   ) src (
     .clk         (             clk ),
     .reset       (           reset ),
+
+    .delay       (       SRC_DELAY ),
 
     .val         (     istream_val ),
     .rdy         (     istream_rdy ),
@@ -74,7 +80,7 @@ module top(  input logic clk, input logic linetrace );
     .done        (        src_done )
   );
 
-  assign src.m = src_msgs;
+  assign src.src.m = src_msgs;
   
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // DUT
@@ -110,14 +116,15 @@ module top(  input logic clk, input logic linetrace );
   // Test sink
   //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  vc_TestSink
+  vc_TestFixedDelaySink
   #(
     .p_msg_nbits ( OUTPUT_TEST_SIZE ),
-    .p_num_msgs  (        NUM_TESTS ),
-    .p_sim_mode  (                1 )
+    .p_num_msgs  (        NUM_TESTS )
   ) sink (
     .clk         (              clk ),
     .reset       (            reset ),
+
+    .delay       (        SNK_DELAY ),
 
     .val         (      ostream_val ),
     .rdy         (      ostream_rdy ),
@@ -126,7 +133,7 @@ module top(  input logic clk, input logic linetrace );
     .done        (         snk_done )
   );
 
-  assign sink.m = snk_msgs;
+  assign sink.sink.m = snk_msgs;
 
   //----------------------------------------------------------------------
   // Task for adding test cases
