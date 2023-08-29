@@ -148,16 +148,19 @@ module vc_TestUnorderedSink
 
             if ( msg === 'hz ) begin
               failed = 1;
+              fail();
               $display( "     [ FAILED ] %s, expected = %x, actual = %x",
                         "msg", m[index], msg );
             end
             else
               casez ( msg )
-                m[index] :
+                m[index] :begin pass();
                   if ( verbose > 0 )
                      $display( "     [ passed ] %s, expected = %x, actual = %x",
                                "msg", m[index], msg );
+                end
                 default : begin
+                  fail();
                   failed = 1;
                   $display( "     [ FAILED ] %s, expected = %x, actual = %x",
                             "msg", m[index], msg );

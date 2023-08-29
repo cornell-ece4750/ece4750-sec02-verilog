@@ -10,7 +10,6 @@
 `define VC_TEST_RAND_DELAY_V
 
 `include "vc/regs.v"
-`include "vc/trace.v"
 
 module vc_TestRandDelay
 #(
@@ -175,7 +174,7 @@ module vc_TestRandDelay
   // Directly connect output msg bits to input msg bits, only when out_val
   // is high
 
-  assign out_msg = out_val ? in_msg : 'hx;
+  assign out_msg = out_val ? in_msg : 'h0;
 
   //----------------------------------------------------------------------
   // Assertions
@@ -191,27 +190,6 @@ module vc_TestRandDelay
     end
   end
 
-  //----------------------------------------------------------------------
-  // Line Tracing
-  //----------------------------------------------------------------------
-
-  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
-
-  `VC_TRACE_BEGIN
-  begin
-
-    $sformat( msg_str, "%x", in_msg );
-    vc_trace.append_val_rdy_str( trace_str, in_val, in_rdy, msg_str );
-
-    vc_trace.append_str( trace_str, "|" );
-
-    $sformat( msg_str, "%x", out_msg );
-    vc_trace.append_val_rdy_str( trace_str, out_val, out_rdy, msg_str );
-
-  end
-  `VC_TRACE_END
-
 endmodule
 
 `endif /* VC_TEST_RAND_DELAY_V */
-

@@ -7,7 +7,6 @@
 
 `include "vc/TestSource.v"
 `include "vc/TestRandDelay.v"
-`include "vc/trace.v"
 
 module vc_TestRandDelaySource
 #(
@@ -56,7 +55,7 @@ module vc_TestRandDelaySource
   // Test random delay
   //----------------------------------------------------------------------
 
-  vc_TestRandDelay#(p_msg_nbits,p_max_delay_nbits) rand_delay
+  vc_TestRandDelay#(p_msg_nbits) msg_delay
   (
     .clk       (clk),
     .reset     (reset),
@@ -72,20 +71,6 @@ module vc_TestRandDelaySource
     .out_msg   (msg)
   );
 
-  //----------------------------------------------------------------------
-  // Line Tracing
-  //----------------------------------------------------------------------
-
-  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
-
-  `VC_TRACE_BEGIN
-  begin
-    $sformat( msg_str, "%x", msg );
-    vc_trace.append_val_rdy_str( trace_str, val, rdy, msg_str );
-  end
-  `VC_TRACE_END
-
 endmodule
 
 `endif /* VC_TEST_RAND_DELAY_SOURCE */
-

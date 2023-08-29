@@ -6,7 +6,6 @@
 `define VC_TEST_SOURCE_V
 
 `include "vc/regs.v"
-`include "vc/trace.v"
 `include "vc/assert.v"
 
 module vc_TestSource
@@ -81,14 +80,21 @@ module vc_TestSource
   //
   // So now we keep the done signal high until the test source is reset.
 
-  always_comb begin
-    if ( reset_reg ) begin
-      done <= 1'b0;
-    end else begin
-      if ( ~done ) begin
-        done <= m[index] === {p_msg_nbits{1'bx}};
-      end
-    end
+  // always_comb begin
+  //   if ( reset_reg ) begin
+  //     done = 1'b0;
+  //   end else begin
+  //     if ( ~done ) begin
+  //       done = m[index] === {p_msg_nbits{1'bx}};
+  //     end
+  //   end
+  // end
+
+  logic done_next;
+  assign done_next = !reset_reg && ( index == ( p_num_msgs - 1 ) );
+
+  always_ff @( posedge clk ) begin
+    if( val && rdy ) done <= done_next;
   end
 
   // Set the source message appropriately
@@ -121,20 +127,6 @@ module vc_TestSource
     end
   end
 
-  //----------------------------------------------------------------------
-  // Line Tracing
-  //----------------------------------------------------------------------
-
-  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
-
-  `VC_TRACE_BEGIN
-  begin
-    $sformat( msg_str, "%x", msg );
-    vc_trace.append_val_rdy_str( trace_str, val, rdy, msg_str );
-  end
-  `VC_TRACE_END
-
 endmodule
 
 `endif /* VC_TEST_SOURCE_V */
-

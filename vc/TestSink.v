@@ -9,7 +9,7 @@
 `define VC_TEST_SINK_V
 
 `include "vc/regs.v"
-`include "vc/test.v"
+`include "vc/trace.v"
 
 module vc_TestSink
 #(
@@ -72,10 +72,12 @@ module vc_TestSink
   // Combinational logic
   //----------------------------------------------------------------------
 
-  // We use a behavioral hack to easily detect when we have gone off the
-  // end of the valid messages in the memory.
+  logic done_next;
+  assign done_next = !reset_reg && ( index == ( p_num_msgs - 1 ) );
 
-  assign done = !reset_reg && ( m[index] === {p_msg_nbits{1'bx}} );
+  always_ff @( posedge clk ) begin
+    if( val && rdy ) done <= done_next;
+  end
 
   // Sink message interface is ready as long as we are not done
 
@@ -99,10 +101,8 @@ module vc_TestSink
   logic        failed;
   logic  [3:0] verbose;
 
-  initial begin
-    if ( !$value$plusargs( "verbose=%d", verbose ) )
-      verbose = 0;
-  end
+  logic  [p_msg_nbits-1:0] m_curr;
+  assign m_curr = m[index];
 
   always_ff @( posedge clk ) begin
     if ( reset ) begin
@@ -110,42 +110,33 @@ module vc_TestSink
     end
     else if ( !reset && go ) begin
 
-      if ( verbose > 0 )
-        $display( "                %m checking message number %0d", index );
-
-      // Cut-and-paste from VC_TEST_NET in vc-test.v
-
-      if ( msg === 'hz ) begin
-        failed = 1;
-        $display( "     [ FAILED ] %s, expected = %x, actual = %x",
-                  "msg", m[index], msg );
-      end
-      else
-        casez ( msg )
-          m[index] :
-            if ( verbose > 0 )
-               $display( "     [ passed ] %s, expected = %x, actual = %x",
-                         "msg", m[index], msg );
-          default : begin
-            failed = 1;
-            $display( "     [ FAILED ] %s, expected = %x, actual = %x",
-                      "msg", m[index], msg );
+      casez ( msg )
+        m_curr :begin
+          pass();
+          $display( "     [ passed ] expected = %x, actual = %x",
+                    m[index], msg );
+        end
+        default : begin
+          fail();
+          failed <= 1;
+          $display( "     [ FAILED ] expected = %x, actual = %x",
+                    m[index], msg );
+                    
+          if ( p_sim_mode ) begin
+            $display( "" );
+            $display( " ERROR: Test sink found a failure!" );
+            $display( "  - module   : %m" );
+            $display( "  - expected : %x", m[index] );
+            $display( "  - actual   : %x", msg );
+            $display( "" );
+            $display( " Verify that all unit tests pass; if they do, then debug" );
+            $display( " the failure and add a new unit test which would have" );
+            $display( " caught the bug in the first place." );
+            $display( "" );
+            $finish;
           end
-        endcase
-
-      if ( p_sim_mode && (failed == 1) ) begin
-        $display( "" );
-        $display( " ERROR: Test sink found a failure!" );
-        $display( "  - module   : %m" );
-        $display( "  - expected : %x", m[index] );
-        $display( "  - actual   : %x", msg );
-        $display( "" );
-        $display( " Verify that all unit tests pass; if they do, then debug" );
-        $display( " the failure and add a new unit test which would have" );
-        $display( " caught the bug in the first place." );
-        $display( "" );
-        $finish_and_return(1);
-      end
+        end
+      endcase
 
     end
   end
@@ -165,14 +156,14 @@ module vc_TestSink
   // Line Tracing
   //----------------------------------------------------------------------
 
-  logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
+  // logic [`VC_TRACE_NBITS_TO_NCHARS(p_msg_nbits)*8-1:0] msg_str;
 
-  `VC_TRACE_BEGIN
-  begin
-    $sformat( msg_str, "%x", msg );
-    vc_trace.append_val_rdy_str( trace_str, val, rdy, msg_str );
-  end
-  `VC_TRACE_END
+  // `VC_TRACE_BEGIN
+  // begin
+  //   $sformat( msg_str, "%x", msg );
+  //   vc_trace.append_val_rdy_str( trace_str, val, rdy, msg_str );
+  // end
+  // `VC_TRACE_END
 
 endmodule
 

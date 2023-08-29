@@ -4,6 +4,8 @@
 
 `ifndef VC_TRACE_V
 `define VC_TRACE_V
+import "DPI-C" function void pass() ;
+import "DPI-C" function void fail() ;
 
 // NOTE: This macro is declared outside of the module to allow some vc
 // modules to see it and use it in their own params. Verilog does not
@@ -48,12 +50,18 @@ module vc_Trace
 
 `ifndef VERILATOR
   initial begin
+    storage = '0;
+    storage[31:0] = 511; 
+    $display("Strating Trace");
     if ( !$value$plusargs( "trace=%d", level ) ) begin
       level = 0;
+
     end
   end
 `else
   initial begin
+      storage = '0;
+      storage[31:0] = 511; 
     level = 1;
   end
 `endif // !`ifndef VERILATOR
@@ -75,6 +83,7 @@ module vc_Trace
     input logic [nbits-1:0] str
   );
   begin
+    trace=trace;
 
     len0 = 1;
     while ( str[len0*8+:8] != 0 ) begin
@@ -86,6 +95,8 @@ module vc_Trace
     for ( idx1 = len0-1; idx1 >= 0; idx1 = idx1 - 1 )
     begin
       trace[ idx0*8 +: 8 ] = str[ idx1*8 +: 8 ];
+      //$display("Storing %d at %d",str[ idx1*8 +: 8 ],idx0);
+      $write("%c",str[ idx1*8 +: 8 ]);
       idx0 = idx0 - 1;
     end
 
@@ -132,7 +143,7 @@ module vc_Trace
     input integer             num
   );
   begin
-
+    trace=trace;
     idx0 = trace[31:0];
 
     for ( idx1 = 0;
@@ -140,6 +151,8 @@ module vc_Trace
           idx1 = idx1 + 1 )
     begin
       trace[idx0*8+:8] = char;
+      //$display("Storing %d at %d",char,idx0);
+      $write("%c",char);
       idx0 = idx0 - 1;
     end
 
@@ -237,31 +250,39 @@ endmodule
 //  vc_Trace vc_trace(clk,reset);                                         \
 //  task line_trace( inout bit [(512*8)-1:0] trace_str );
 
-`ifndef VERILATOR
-`define VC_TRACE_BEGIN                                                  \
+`ifdef VERILATOR
+`define VC_TRACE_BEGIN                                        \
+  /*verilator coverage_off*/          \
+  integer idx1;                                                \
+  integer idx0;                                                \
   vc_Trace vc_trace(clk,reset);                                         \
                                                                         \
   task display_trace;                                                   \
   begin                                                                 \
+    /*vc_trace.storage = '0;*/                                                                    \
+    vc_trace.storage[31:0] = 511;                                                                    \
                                                                         \
     if ( vc_trace.level > 0 ) begin                                     \
-      vc_trace.storage[15:0] = vc_trace.nchars-1;                       \
-                                                                        \
+      \
+       /*$display("getting trace");  */                                                               \
+      $write( "%4d: ", vc_trace.cycles );                               \
       line_trace( vc_trace.storage );                                   \
                                                                         \
-      $write( "%4d: ", vc_trace.cycles );                               \
                                                                         \
-      vc_trace.idx0 = vc_trace.storage[15:0];                           \
-      for ( vc_trace.idx1 = vc_trace.nchars-1;                          \
-            vc_trace.idx1 > vc_trace.idx0;                              \
-            vc_trace.idx1 = vc_trace.idx1 - 1 )                         \
+      vc_trace.idx0 = vc_trace.storage[31:0];                           \
+       idx0=vc_trace.idx0 ;                                      \
+      \
+      /*$display ("Output Trace %d to %d", idx0,vc_trace.nchars-1);    */                               \
+      for ( idx1 = vc_trace.nchars-1;                          \
+            idx1 > idx0;                              \
+            idx1 = idx1- 1 )                         \
       begin                                                             \
-        $write( "%s", vc_trace.storage[vc_trace.idx1*8+:8] );           \
+        /*$write( "%d,%d",idx1, vc_trace.storage[vc_trace.idx1*8+:8] );           \
+        $display("Retriving %d at %d",vc_trace.storage[vc_trace.idx1*8+:8] ,idx1); */                  \
       end                                                               \
       $write("\n");                                                     \
                                                                         \
     end                                                                 \
-                                                                        \
     vc_trace.cycles_next = vc_trace.cycles + 1;                         \
                                                                         \
   end                                                                   \
@@ -280,6 +301,7 @@ endmodule
 //------------------------------------------------------------------------
 
 `define VC_TRACE_END \
+  /*verilator coverage_on*/ \
   endtask
 
 `endif /* VC_TRACE_V */
