@@ -39,63 +39,91 @@ how we are using registered inputs. In this course, if we want to include
 registers in a block we usually prefer registered inputs instead of
 registered outputs.
 
-![](assets/fig/tb_Adder.png)
+![](assets/fig/adder.png)
 
 Here is the interface for our latency-insensitive adder.
 
-    module imul_IntMulScycleV1
+    module sec02_Adder
     (
-      input  logic        clk,
-      input  logic        reset,
-
-      input  logic [31:0] in0,
-      input  logic [31:0] in1,
-      output logic [31:0] out
+     input  logic        clk,
+     input  logic        reset,
+   
+     input  logic        istream_val,
+     output logic        istream_rdy,
+     input  logic [63:0] istream_msg,
+   
+     output logic        ostream_val,
+     input  logic        ostream_rdy,
+     output logic [31:0] ostream_msg
     );
 
-Our single-cycle multiplier takes two 32-bit input values and produces a
-32-bit output value. Notice our coding conventions. We prefix all Verilog
-module names with the corresponding directory path, we use CamelCase for
-Verilog module names, and we align all port names. We can implement this
-single-cycle multiplier flat (i.e., directly use behavioral modeling
-without instantiating any child modules) or structurally (i.e.,
-instantiate child modules). Here is what a flat implementation might look
+Our adder takes two 32-bit input values concatenated together (`istream_msg`)
+and produces a 32-bit output value, the resulting addition of both. We use a 
+latency-insensitive microprotocol (`val/rdy` interface) to determine when to 
+send in the inputs and push out the outputs.
+We can implement this adder flat (i.e., directly use behavioral modeling without instantiating any 
+child modules) or structurally (i.e., instantiate child modules). Here is what a flat implementation might look
 like:
 
+    // Split apart our operands
+    logic [31:0] a;
+    logic [31:0] b;
+  
+    assign a = istream_msg[31: 0];
+    assign b = istream_msg[63:32];
+  
     //----------------------------------------------------------------------
-    // Input Registers (sequential logic)
+    // Control Logic
     //----------------------------------------------------------------------
-
-    logic [31:0] in0_reg;
-    logic [31:0] in1_reg;
-
-    always @( posedge clk ) begin
-      if ( reset ) begin
-        in0_reg <= 32'b0;
-        in1_reg <= 32'b0;
+  
+    logic istream_send;
+    logic ostream_send;
+  
+    assign istream_send = ( istream_val & istream_rdy );
+    assign ostream_send = ( ostream_val & ostream_rdy );
+  
+    logic val_reg;
+  
+    always_ff @( posedge clk ) begin
+      if     ( reset        ) val_reg <= 0;
+      else if( istream_send ) val_reg <= 1; // New transaction
+      else if( ostream_send ) val_reg <= 0; // Remove old transaction
+    end
+  
+    assign ostream_val = val_reg;
+  
+    // Ready whenever we aren't valid, or are passing on the old message
+    assign istream_rdy = ( ostream_send | !val_reg );
+  
+    //----------------------------------------------------------------------
+    // Datapath Logic
+    //----------------------------------------------------------------------
+  
+    logic [31:0] a_reg;
+    logic [31:0] b_reg;
+  
+    always_ff @( posedge clk ) begin
+      if( reset ) begin
+        a_reg <= 32'b0;
+        b_reg <= 32'b0;
       end
-      else begin
-        in0_reg <= in0;
-        in1_reg <= in1;
+  
+      else if( istream_send ) begin
+        a_reg <= a;
+        b_reg <= b;
       end
     end
+  
+    // Calculate the sum
+    assign ostream_msg = a_reg + b_reg;
 
-    //----------------------------------------------------------------------
-    // Multiplication Logic (combinational logic)
-    //----------------------------------------------------------------------
-
-    always @(*) begin
-      out = in0_reg * in1_reg;
-    end
-
-Note that we are using an `always @(posedge clk)` to model sequential
-logic and an `always @(*)` to model combinational logic. Always be very
-explicit about what part of your design is sequential and what part is
-combinational. **Always** use non-blocking assignments (`<=`) in an
-`always @(posedge clk)` and **always** use blocking assignments (`=`) in
-an `always @(*)`. At least when getting started, try to avoid including
-too much combinational logic in your sequential blocks. You can also
-include simple combinational logic directly in an `assign` statement. So
-we could replace the `always @(*)` with the following:
+Note that in this example, we use `always_ff` to model sequential
+logic and `assign` assignments or `always_comb` for combinational logic. 
+Always be very explicit about what part of your design is sequential and 
+what part is combinational. **Always** use non-blocking assignments (`<=`)
+for sequential logic and **always** use blocking assignments (`=`) for
+cobinational logic. At least when getting started, try to avoid including
+too much combinational logic in your sequential blocks. It will save you (us!)
+hours of debugging and headaches.
 
 
