@@ -15,7 +15,8 @@ ECE 4750 Section 2: RTL Design with Verilog
 
 This discussion section serves as gentle introduction to our
 Verilog RTL design and testing flow. For an in-depth Verilog guide,
-we recommend reading [our Verilog tutorial] or [HDLBits]. 
+we recommend reading [our Verilog tutorial](https://www.csl.cornell.edu/courses/ece4750/handouts.html) 
+or [HDLBits](https://hdlbits.01xz.net/wiki/Main_Page). 
 
 Let's start by logging into the `ecelinux` servers using the remote 
 access option of your choice. Then, source the setup script and download
@@ -58,9 +59,9 @@ Here is the interface for our latency-insensitive adder.
     );
 
 Our adder takes two 32-bit input values concatenated together (`istream_msg`)
-and produces a 32-bit output value, the resulting addition of both. We use a 
-latency-insensitive microprotocol (`val/rdy` interface) to determine when to 
-send in the inputs and push out the outputs.
+and produces a 32-bit output value, the resulting addition of both. We decide
+to use a latency-insensitive microprotocol (`val/rdy` interface) to determine 
+when to send in the inputs and push out the outputs.
 We can implement this adder flat (i.e., directly use behavioral modeling without instantiating any 
 child modules) or structurally (i.e., instantiate child modules). Here is what a flat implementation might look
 like:
