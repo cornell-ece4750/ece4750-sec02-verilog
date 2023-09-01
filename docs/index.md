@@ -59,9 +59,9 @@ Here is the interface for our latency-insensitive adder.
     );
 
 Our adder takes two 32-bit input values concatenated together (`istream_msg`)
-and produces a 32-bit output value, the resulting addition of both. We decide
-to use a latency-insensitive microprotocol (`val/rdy` interface) to determine 
-when to send in the inputs and push out the outputs.
+and produces a 32-bit output value, the resulting addition of both (`ostream_msg`). 
+We decide to use a latency-insensitive microprotocol (`val/rdy` interface) to 
+determine when to send in the inputs and push out the outputs.
 We can implement this adder flat (i.e., directly use behavioral modeling without instantiating any 
 child modules) or structurally (i.e., instantiate child modules). Here is what a flat implementation might look
 like:
