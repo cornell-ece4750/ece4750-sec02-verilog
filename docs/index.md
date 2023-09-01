@@ -501,6 +501,45 @@ Clicking on a module will display all of the signals for that module in the bott
 
 Between waveforms and your RTL, you should be able to debug most issues you encounter. Having the waveforms lets you know the specific values of the signals at any point in time, and the RTL describes how they are being set. If you end up with a signal that isn't what you expected it to be, tracing back the values in the waveform (and what assigns those values in the RTL) is a great way to debug your Verilog.
 
+### Keep testing!
+Adding a test case is as easy as including an additional line where the other test cases
+are located and modifying the `NUM_TESTS` variable at the top, for example:
+    
+    ...
+
+    //------------------------------------------------------------------------
+    // Testbench defines
+    //------------------------------------------------------------------------
+
+    localparam NUM_TESTS = 5;
+
+    ...
+
+     //----------------------------------------------------------------------
+     // Test cases
+     //----------------------------------------------------------------------
+     // Don't forget to change NUM_TESTS above when adding new tests!
+
+      logic [31:0] rand_msg1;
+      logic [31:0] rand_msg2;
+
+      initial begin
+
+        // Test cases
+
+        test_case( { 32'd1, 32'd1 },  32'd2 );
+        test_case( { 32'd2, 32'd2 },  32'd4 );
+        test_case( { 32'd4, 32'd5 },  32'd9 );
+        test_case( { 32'd0, 32'd0 },  32'd0 );
+        test_case( { 32'd4, 32'd5 },  32'd9 );
+
+      end
+
+
+ - What happens if a test case is wrong?
+ - How does our design handle an overflow? Design a test for this case.
+ 
+
 To do on your own
 --------------------------------------------------------------------------
 Now that you know how our basic RTL design and verification flow is set up,
