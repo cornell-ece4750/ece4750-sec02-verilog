@@ -34,7 +34,7 @@ our sample project.
 Verilog RTL for a latency-insensitive adder
 --------------------------------------------------------------------------
 
-We will start by implementing a simple single-cycle multiplier. Whenever
+We will start by implementing a simple latency-insensitive adder. Whenever
 implementing hardware, we always like to start with some kind of diagram. It
 could be a block diagram, datapath diagram, or finite-state-machine
 diagram. Here is a block diagram for our latency-insensitive adder. Notice
