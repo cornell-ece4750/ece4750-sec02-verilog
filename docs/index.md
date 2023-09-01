@@ -4,6 +4,7 @@ ECE 4750 Section 2: RTL Design with Verilog
 
  - Author: Aidan C. McNay and Cecilio C. Tamarit
  - Date: August 31, 2023
+ - Loosely based on previous ECE 4750 material from Christopher Batten
 
 **Table of Contents**
 
@@ -12,32 +13,35 @@ ECE 4750 Section 2: RTL Design with Verilog
  - The Perpetual Testing Initiative
  - When all else fails
 
-This discussion section serves as gentle introduction to the basics of
-Verilog RTL design. You should start by logging into the `ecelinux`
-servers using the remote access option of your choice and then source the
-setup script.
+This discussion section serves as gentle introduction to our
+Verilog RTL design and testing flow. For an in-depth Verilog guide,
+we recommend reading [our Verilog tutorial] or [HDLBits]. 
+
+Let's start by logging into the `ecelinux` servers using the remote 
+access option of your choice. Then, source the setup script and download
+our sample project.
 
     % source setup-ece4750.sh
-    % mkdir -p $HOME/ece4750
-    % cd $HOME/ece4750
-    % git clone git@github.com:cornell-ece4750/ece4750-sec02-verilog sec02
+    % mkdir -p $HOME/ece4750/sec
+    % cd $HOME/ece4750/sec
+    % wget
     % cd sec02
     % TOPDIR=$PWD
 
-Verilog RTL for Single-Cycle Multiplier
+Verilog RTL for a latency-insensitive adder
 --------------------------------------------------------------------------
 
-We will start by implementing a simple single-cycle multiplier. Whever
-implementing hardware, we always like start with some kind of diagram. It
+We will start by implementing a simple single-cycle multiplier. Whenever
+implementing hardware, we always like to start with some kind of diagram. It
 could be a block diagram, datapath diagram, or finite-state-machine
-diagram. Here is a block diagram for our single-cycle multiplier. Notice
+diagram. Here is a block diagram for our latency-insensitive adder. Notice
 how we are using registered inputs. In this course, if we want to include
 registers in a block we usually prefer registered inputs instead of
 registered outputs.
 
-![](assets/fig/imul-v1.png)
+![](assets/fig/tb_Adder.png)
 
-Here is the interface for our single-cycle multiplier.
+Here is the interface for our latency-insensitive adder.
 
     module imul_IntMulScycleV1
     (
