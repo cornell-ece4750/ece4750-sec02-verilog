@@ -448,17 +448,66 @@ test cases for 1+1, 2+2, and 4+5.
 
 We have also included two other testbenches with fixed and random delays in the
 communication between source, DUT, and sink: `tb_Adder_FixedDelay.v` and 
-`tb_Adder_RandDelay.v`.
+`tb_Adder_RandDelay.v`. To do this, the only change in the code is that the source
+and sink modules we are instantiating have been modified to include additional logic 
+that creates this artificial delay.
 
 ![](assets/fig/tb_Adder_FixedDelay.png)
 
 ![](assets/fig/tb_Adder_RandDelay.png)
 
+### Making sense of traces
+We can easily generate traces for our simulations with the Makefile:
+
+    % make tb_Adder.v DESIGN=Adder RUN_ARG=--trace
+
+The output should now look similar to this:
+
+    Starting tb_Adder...
+       0:                  (                                ) .       
+       0:                  (                                ) .       
+       0:                  (                                ) .       
+       0:                  (                                ) .       
+       1: 0000000100000001 (                                )         
+       2: 0000000200000002 ( 00000001 + 00000001 = 00000002 ) 00000002
+         [ passed ] expected = 00000002, actual = 00000002
+       3: 0000000400000005 ( 00000002 + 00000002 = 00000004 ) 00000004
+         [ passed ] expected = 00000004, actual = 00000004
+       4:                  ( 00000005 + 00000004 = 00000009 ) 00000009
+         [ passed ] expected = 00000009, actual = 00000009
+       5:                  (                                ) .       
+    The testbench has finished
+       6:                  (                                ) .       
+       7:                  (                                ) .       
+       8:                  (                                ) .       
+       9:                  (                                ) . 
+
+In this example, the first column displays the input of our DUT, the last the output, 
+while the middle one represents the internal state. The line numbers at the left indicate
+which cycle each line corresponds to. Interleaved with the line trace we can also
+see the outcomes of the tests as they get triggered. 
+
+### Making sense of waveforms
+Our testbenches and linetraces are often enough to debug smaller issues. However, having additional information can be invaluable in some cases. Waveforms are plots of how signals change over time, and are useful for understanding exactly how values propagate through your design. When you run the testbenches for ECE 4750, waveforms are automatically generated for you in a waves subdirectory.
+
+We will use gtkwave, an open-source waveform viewer, to analyze these waves. Note that to do this you should be using X2Go, MobaXTerm, or have X11 forwarding set up. For our Adder design, we can view the waveform from our testbench with the following command:
+
+    % cd $TOPDIR/sec02/waves
+    % gtkwave Adder.tb_Adder.waves.fst
+
+This should open up GTKWave. The top-left shows the module hierarchy within your design; by clicking on the "+" signs, you can find `top` (the top-level testbench module), `src` and `sink` (our testbench source and sink), and `dut` (the design-under-test, which is our adder in this case).
+
+Clicking on a module will display all of the signals for that module in the bottom-left. You can select them and use the buttons at the bottom to add them to the plot, displayed on the right. It is common to add clk and reset signals first for reference.
+
+Between waveforms and your RTL, you should be able to debug most issues you encounter. Having the waveforms lets you know the specific values of the signals at any point in time, and the RTL describes how they are being set. If you end up with a signal that isn't what you expected it to be, tracing back the values in the waveform (and what assigns those values in the RTL) is a great way to debug your Verilog.
+
 To do on your own
 --------------------------------------------------------------------------
 Now that you know how our basic RTL design and verification flow is set up,
 go back to Lab 1. How would you modify the test cases of our adder for perfect
-coverage? This will be a good practice exercise before you dive into designing
-the test cases for the multiplier. Remember: Keep testing!
+coverage? Bring your results next week. This will be a good practice exercise 
+before you dive into designing the test cases for the multiplier. 
+
+Remember: Keep testing!
 
 
