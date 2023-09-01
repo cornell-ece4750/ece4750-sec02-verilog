@@ -438,4 +438,21 @@ with `tb_Adder.v`:
 
 ![](assets/fig/tb_Adder.png)
 
+This structure of this testbench is standard: We first instantiate the 
+**DUT (Device Under Test)**, in this case it is `Adder`. The purpose of the test
+is to ensure that the DUT operates as per the specifications. To verify this, we 
+instantiate and attach the DUT to **Source** and **Sink** modules (`vc_TestSource`
+and `vc_TestSink`) that store, and send/receive the inputs and outputs we want to 
+test, respectively.
+
+We then define a task that we can use below to create 3 example test cases for 
+1+1, 2+2, and 4+5.
+
+To do on your own
+--------------------------------------------------------------------------
+Now that you know how our basic RTL design and verification flow is set up,
+go back to Lab 1. How would you modify the test cases of our adder for perfect
+coverage? This will be a good practice exercise before you dive into testing
+the multiplier.
+
 
