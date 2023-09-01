@@ -128,3 +128,23 @@ too much combinational logic in your sequential blocks. It will save you (us!)
 hours of debugging and headaches.
 
 
+Verilator Crash Course
+--------------------------------------------------------------------------
+In this class we will be using Verilator to simulate and check our designs
+for correctness. Strictly, Verilator is not a simulator, but a compiler: It
+generates ("verilates") C++ and SystemC code from your original Verilog files.
+For example, we could verilate ``hello.v`` as follows:
+
+    % verilator --binary -j 0 -Wall hello.v
+
+This can then be compiled as usual (e.g. with GCC) and run as a native binary.
+If the verilated code contains a Verilog testbench, we _will_ essentially 
+be simulating said testbench when running the executable.
+As the complexity of a project increases, so do the lengths of the commands,
+and thus in the labs and this section we have provided Makefiles that will
+do the heavy lifting so that you can focus on what matters: Computer Architecture.
+
+The `verilator.cpp` file provided in sec02.tar.gz is a wrapper that will 
+configure the simulation, instantiate the top module, etc.
+
+
