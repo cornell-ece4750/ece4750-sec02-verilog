@@ -186,7 +186,7 @@ contain the testbenches and designs to be tested. You can run everything with:
 
 Or you can choose designs and testbenches individually, for example:
 
-   % make tb_Adder.v DESIGN=Adder
+    % make tb_Adder.v DESIGN=Adder
 
 After everything compiles, you should see the output of the testbench in your terminal.
 
