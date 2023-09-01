@@ -443,16 +443,22 @@ This structure of this testbench is standard: We first instantiate the
 is to ensure that the DUT operates as per the specifications. To verify this, we 
 instantiate and attach the DUT to **Source** and **Sink** modules (`vc_TestSource`
 and `vc_TestSink`) that store, and send/receive the inputs and outputs we want to 
-test, respectively.
+test, respectively. We then define a task that we can use below to create 3 example 
+test cases for 1+1, 2+2, and 4+5. 
 
-We then define a task that we can use below to create 3 example test cases for 
-1+1, 2+2, and 4+5.
+We have also included two other testbenches with fixed and random delays in the
+communication between source, DUT, and sink: `tb_Adder_FixedDelay.v` and 
+`tb_Adder_RandDelay.v`.
+
+![](assets/fig/tb_Adder_FixedDelay.png)
+
+![](assets/fig/tb_Adder_RandDelay.png)
 
 To do on your own
 --------------------------------------------------------------------------
 Now that you know how our basic RTL design and verification flow is set up,
 go back to Lab 1. How would you modify the test cases of our adder for perfect
-coverage? This will be a good practice exercise before you dive into testing
-the multiplier.
+coverage? This will be a good practice exercise before you dive into designing
+the test cases for the multiplier. Remember: Keep testing!
 
 
