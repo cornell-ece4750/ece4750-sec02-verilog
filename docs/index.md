@@ -25,9 +25,11 @@ our sample project.
     % source setup-ece4750.sh
     % mkdir -p $HOME/ece4750/sec
     % cd $HOME/ece4750/sec
-    % wget
-    % cd sec02
     % TOPDIR=$PWD
+    % wget https://github.com/cornell-ece4750/ece4750-sec02-verilog/raw/m3/docs/sec02.tar.gz
+    % tar xvf sec02.tar.gz
+    % rm sec02.tar.gz
+    % cd sec02
 
 Verilog RTL for a latency-insensitive adder
 --------------------------------------------------------------------------
@@ -42,7 +44,7 @@ registered outputs.
 
 ![](assets/fig/adder.png)
 
-Here is the interface for our latency-insensitive adder.
+Here is the interface for our latency-insensitive adder in `Adder.v`.
 
     module sec02_Adder
     (
@@ -160,11 +162,46 @@ hardware is forever unless we kill it, which we can easily do with Ctrl+C.
 If the verilated code contains a Verilog testbench, we _will_ essentially 
 be simulating said testbench when running the executable.
 The `verilator.cpp` file provided in sec02.tar.gz is a wrapper that will 
-configure the simulation, instantiate the top module, etc.
+configure the simulation, instantiate the top module, etc. The `vc` folder 
+contains dependencies.
 As the complexity of a project increases, so do the lengths of the commands,
 and thus in the labs and this section we have provided Makefiles that will
 do the heavy lifting so that you can focus on what matters: Computer Architecture.
 
-Let's test out our latency-insensitive adder with Verilator! The Makefile will set
-up the directory structure for us:
+Let's test out our latency-insensitive adder with Verilator! The Makefile in the
+`sec` folder will set up the directory structure for us:
 
+    % cd $TOPDIR
+    % make setup
+
+Now we can head over to today's section again:
+
+    % cd sec02
+
+Observe that every subproject will have its own symlink to the Makefile and
+its own configuration file `default.config` specifying which Verilog files
+contain the testbenches and designs to be tested. You can run everything with:
+
+    % make run-all
+
+Or you can choose designs and testbenches individually, for example:
+
+   % make tb_Adder.v DESIGN=Adder
+
+After everything compiles, you should see the output of the testbench in your terminal.
+
+    -- RUN ---------------------
+    
+    Starting tb_Adder...
+         [ passed ] expected = 00000002, actual = 00000002
+         [ passed ] expected = 00000004, actual = 00000004
+         [ passed ] expected = 00000009, actual = 00000009
+    The testbench has finished
+    - tb_Adder.v:193: Verilog $finish
+    Passed 3 of 3 test
+    +++
+    
+    -- DONE --------------------
+
+Note that in this case we have three tests, and thus three plus signs ("+++")
+indicating that they all passed.
