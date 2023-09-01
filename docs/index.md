@@ -133,18 +133,38 @@ Verilator Crash Course
 In this class we will be using Verilator to simulate and check our designs
 for correctness. Strictly, Verilator is not a simulator, but a compiler: It
 generates ("verilates") C++ and SystemC code from your original Verilog files.
-For example, we could verilate ``hello.v`` as follows:
+
+Let's start politely with a greeting by creating ``hello.v``:
+
+    module hello;
+    
+    initial begin
+      $display ("Hello");
+    end
+    
+    endmodule
+
+We can verilate ``hello.v`` as follows:
 
     % verilator --binary -j 0 -Wall hello.v
 
-This can then be compiled as usual (e.g. with GCC) and run as a native binary.
+This can then be compiled as usual (e.g. with GCC) and run as a native binary,
+which will be stored in the ``obj_dir`` directory:
+
+    % cd $TOPDIR/obj_dir
+    % ./Vhello
+
+This (non-synthesizable) snippet will print "Hello" and run _ad perpetuam_:
+hardware is forever unless we kill it, which we can easily do with Ctrl+C.
+
 If the verilated code contains a Verilog testbench, we _will_ essentially 
 be simulating said testbench when running the executable.
+The `verilator.cpp` file provided in sec02.tar.gz is a wrapper that will 
+configure the simulation, instantiate the top module, etc.
 As the complexity of a project increases, so do the lengths of the commands,
 and thus in the labs and this section we have provided Makefiles that will
 do the heavy lifting so that you can focus on what matters: Computer Architecture.
 
-The `verilator.cpp` file provided in sec02.tar.gz is a wrapper that will 
-configure the simulation, instantiate the top module, etc.
-
+Let's test out our latency-insensitive adder with Verilator! The Makefile will set
+up the directory structure for us:
 
