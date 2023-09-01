@@ -547,6 +547,7 @@ go back to Lab 1. How would you modify the test cases of our adder for perfect
 coverage? Bring your results next week. This will be a good practice exercise 
 before you dive into designing the test cases for the multiplier. 
 
+
 Remember: Keep testing!
 
 
