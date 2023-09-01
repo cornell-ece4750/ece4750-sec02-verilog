@@ -436,6 +436,6 @@ with `tb_Adder.v`:
     endmodule
 
 
-![](assets/fig/tb_Adder)
+![](assets/fig/tb_Adder.png)
 
 
